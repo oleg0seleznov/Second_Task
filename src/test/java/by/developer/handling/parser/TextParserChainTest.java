@@ -53,4 +53,81 @@ class TextParserChainTest {
     GrammarSign parsedGrammarSign = assertInstanceOf(GrammarSign.class, grammarSign);
     assertInstanceOf(TextLeaf.class, parsedGrammarSign);
   }
+
+  @Test
+  void breaksCustomTextIntoTypedComponentsWithTheirContent() {
+    // given
+    String source = "Hi, 42!\n\nA?";
+
+    // when
+    CompositeTextComponent text = PARSER.parse(source);
+
+    // then
+    assertEquals(CompositeType.TEXT, text.getType());
+    assertEquals(source, text.getContent());
+    List<TextComponent> textChildren = text.getChildren();
+    CompositeTextComponent firstParagraph =
+        assertInstanceOf(CompositeTextComponent.class, textChildren.get(0));
+    assertEquals(CompositeType.PARAGRAPH, firstParagraph.getType());
+    assertEquals("Hi, 42!", firstParagraph.getContent());
+
+    CompositeTextComponent firstSentence =
+        assertInstanceOf(CompositeTextComponent.class, firstParagraph.getChildren().get(0));
+    assertEquals(CompositeType.SENTENCE, firstSentence.getType());
+    assertEquals("Hi, 42!", firstSentence.getContent());
+
+    CompositeTextComponent firstLexeme =
+        assertInstanceOf(CompositeTextComponent.class, firstSentence.getChildren().get(0));
+    assertEquals(CompositeType.LEXEME, firstLexeme.getType());
+    assertEquals("Hi,", firstLexeme.getContent());
+    CompositeTextComponent firstWord =
+        assertInstanceOf(CompositeTextComponent.class, firstLexeme.getChildren().get(0));
+    assertEquals(CompositeType.WORD, firstWord.getType());
+    assertEquals("Hi", firstWord.getContent());
+        Letter firstLetter = assertInstanceOf(Letter.class, firstWord.getChildren().get(0));
+        assertEquals("H", firstLetter.getContent());
+        Letter secondLetter = assertInstanceOf(Letter.class, firstWord.getChildren().get(1));
+        assertEquals("i", secondLetter.getContent());
+    GrammarSign comma =
+        assertInstanceOf(GrammarSign.class, firstLexeme.getChildren().get(1));
+    assertEquals(",", comma.getContent());
+
+    assertEquals(" ", firstSentence.getChildren().get(1).getContent());
+    CompositeTextComponent numberLexeme =
+        assertInstanceOf(CompositeTextComponent.class, firstSentence.getChildren().get(2));
+    assertEquals(CompositeType.LEXEME, numberLexeme.getType());
+    assertEquals("42!", numberLexeme.getContent());
+    TextLeaf four = assertInstanceOf(TextLeaf.class, numberLexeme.getChildren().get(0));
+    assertEquals("4", four.getContent());
+    TextLeaf two = assertInstanceOf(TextLeaf.class, numberLexeme.getChildren().get(1));
+    assertEquals("2", two.getContent());
+    GrammarSign exclamationMark =
+        assertInstanceOf(
+            GrammarSign.class, numberLexeme.getChildren().get(2));
+    assertEquals("!", exclamationMark.getContent());
+
+    TextLeaf paragraphSeparator =
+        assertInstanceOf(TextLeaf.class, textChildren.get(1));
+    assertEquals("\n\n", paragraphSeparator.getContent());
+    CompositeTextComponent secondParagraph =
+        assertInstanceOf(CompositeTextComponent.class, textChildren.get(2));
+    assertEquals(CompositeType.PARAGRAPH, secondParagraph.getType());
+    assertEquals("A?", secondParagraph.getContent());
+    CompositeTextComponent secondSentence =
+        assertInstanceOf(CompositeTextComponent.class, secondParagraph.getChildren().get(0));
+    assertEquals(CompositeType.SENTENCE, secondSentence.getType());
+    CompositeTextComponent finalLexeme =
+        assertInstanceOf(CompositeTextComponent.class, secondSentence.getChildren().get(0));
+    assertEquals(CompositeType.LEXEME, finalLexeme.getType());
+    assertEquals("A?", finalLexeme.getContent());
+    CompositeTextComponent finalWord =
+        assertInstanceOf(CompositeTextComponent.class, finalLexeme.getChildren().get(0));
+    assertEquals(CompositeType.WORD, finalWord.getType());
+    assertEquals("A", finalWord.getContent());
+    Letter finalLetter = assertInstanceOf(Letter.class, finalWord.getChildren().get(0));
+    assertEquals("A", finalLetter.getContent());
+    GrammarSign questionMark =
+        assertInstanceOf(GrammarSign.class, finalLexeme.getChildren().get(1));
+    assertEquals("?", questionMark.getContent());
+  }
 }

@@ -19,8 +19,8 @@ public class TextFileReader implements TextFileReaderService {
       List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
       return String.join(System.lineSeparator(), lines);
     } catch (IOException exception) {
-      LOGGER.error("Не удалось прочитать файл: {}", path, exception);
-      throw new TextProcessingException("Не удалось прочитать файл: " + path, exception);
+      LOGGER.debug("Failed to read file: {}", path, exception);
+      throw new TextProcessingException("Failed to read file: " + path, exception);
     }
   }
 }

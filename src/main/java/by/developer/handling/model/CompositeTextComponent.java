@@ -32,4 +32,16 @@ public final class CompositeTextComponent implements TextComponent {
     }
     return content.toString();
   }
+
+  @Override 
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof CompositeTextComponent)) {
+      return false;
+    }
+    CompositeTextComponent other = (CompositeTextComponent) obj;
+    return type == other.type && children.equals(other.children);
+  }
 }

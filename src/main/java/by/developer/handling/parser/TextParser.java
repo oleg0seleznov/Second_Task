@@ -12,7 +12,7 @@ public abstract class TextParser {
 
   protected TextComponent parseNext(String content) {
     if (nextParser == null) {
-      throw new TextProcessingException("В цепочке парсеров отсутствует следующий парсер.");
+      throw new TextProcessingException("In the parser chain, the next parser is missing.");
     }
     return nextParser.parse(content);
   }
